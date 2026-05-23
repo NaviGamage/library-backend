@@ -29,7 +29,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private Boolean isBlacklisted = false;
+    @Column(name = "is_blacklisted")
+    private boolean blacklisted = false;
 
     private LocalDateTime createdAt;
 
@@ -45,7 +46,9 @@ public class User implements UserDetails {
     public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() { return !isBlacklisted; }
+    public boolean isAccountNonLocked() {
+        return !blacklisted;
+    }
 
     @Override
     public boolean isCredentialsNonExpired() { return true; }
