@@ -18,19 +18,27 @@ public class BookController {
 
     private final BookService bookService;
 
+    // Anyone can view books with optional filters
     @GetMapping
-    public ResponseEntity<List<BookResponse>> getAllBooks() {
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public ResponseEntity<List<BookResponse>> getAllBooks(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String language) {
+        return ResponseEntity.ok(bookService.getAllBooks(categoryId, author, genre, language));
     }
 
+    // Anyone can view single book
     @GetMapping("/{id}")
     public ResponseEntity<BookResponse> getBookById(@PathVariable Long id) {
         return ResponseEntity.ok(bookService.getBookById(id));
     }
 
+    // Librarian only
     @PostMapping
     @PreAuthorize("hasRole('LIBRARIAN')")
-    public ResponseEntity<BookResponse> addBook(@Valid @RequestBody BookRequest request) {
+    public ResponseEntity<BookResponse> addBook(
+            @Valid @RequestBody BookRequest request) {
         return ResponseEntity.ok(bookService.addBook(request));
     }
 
