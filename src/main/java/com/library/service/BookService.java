@@ -22,8 +22,9 @@ public class BookService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<BookResponse> getAllBooks() {
-        return bookRepository.findAll()
+    public List<BookResponse> getAllBooks(Long categoryId, String author,
+                                          String genre, String language) {
+        return bookRepository.findWithFilters(categoryId, author, genre, language)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
