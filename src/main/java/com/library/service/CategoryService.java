@@ -3,23 +3,24 @@ package com.library.service;
 import com.library.dto.CategoryRequest;
 import com.library.model.Category;
 import com.library.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    @Transactional(readOnly = true)
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
+    @Transactional
     public Category addCategory(CategoryRequest request) {
         validateCategoryRequest(request);
 
@@ -32,6 +33,7 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+    @Transactional
     public Category updateCategory(Long id, CategoryRequest request) {
         validateCategoryRequest(request);
 
@@ -47,6 +49,7 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+    @Transactional
     public void deleteCategory(Long id) {
         if (!categoryRepository.existsById(id)) {
             throw new RuntimeException("Category not found with id: " + id);

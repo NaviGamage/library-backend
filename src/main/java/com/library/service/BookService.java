@@ -7,21 +7,21 @@ import com.library.model.BookStatus;
 import com.library.model.Category;
 import com.library.repository.BookRepository;
 import com.library.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
 
+    @Transactional(readOnly = true)
     public List<BookResponse> getAllBooks() {
         return bookRepository.findAll()
                 .stream()
@@ -29,12 +29,14 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public BookResponse getBookById(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         return mapToResponse(book);
     }
 
+    @Transactional
     public BookResponse addBook(BookRequest request) {
         validateBookRequest(request);
         Book book = new Book();
@@ -42,6 +44,7 @@ public class BookService {
         return mapToResponse(bookRepository.save(book));
     }
 
+    @Transactional
     public BookResponse updateBook(Long id, BookRequest request) {
         validateBookRequest(request);
         Book book = bookRepository.findById(id)
@@ -50,6 +53,7 @@ public class BookService {
         return mapToResponse(bookRepository.save(book));
     }
 
+    @Transactional
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
             throw new RuntimeException("Book not found with id: " + id);
@@ -57,19 +61,18 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
+    @Transactional
     public BookResponse updateBookStatus(Long id, BookRequest request) {
         if (request.getStatus() == null) {
             throw new RuntimeException("Status is required!");
         }
         validateBookStatus(request.getStatus());
-
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         book.setStatus(request.getStatus());
         return mapToResponse(bookRepository.save(book));
     }
 
-    // Business logic validation
     private void validateBookRequest(BookRequest request) {
         if (request.getTitle() == null || request.getTitle().isBlank()) {
             throw new RuntimeException("Book title is required!");
